@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html dir="ltr">
+    <head>
+        <!--Basic stuff:-->
+        <title>Line drawer</title>
+
+
+
+        <!--Other stuff:-->
+
+        <!--Google icons-->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,200,0,200" />
+        <!--Fitty.js (to fit the google icons)-->
+        <script src="https://rikschennink.github.io/fitty/dist/fitty.min.js" type="text/javascript"></script>
+
+        <style type="text/css">
+            /* Imports from google fonts */
+
+            /* Lato - Regular 400 */
+            @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
+            /* Google icons */
+            google-icon {
+                font-variation-settings:
+                    'FILL' 0,
+                    'wght' 200,
+                    'GRAD' 200,
+                    'opsz' 48;
+                
+                font-family: "Material Symbols Outlined";
+            }
+        </style>
+
+        <style type="text/css">
+            /* Styling */
+
+            #page-wrapper {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+
+            #options-wrapper {
+                position: fixed;
+                left: 2px;
+                bottom: 2px;
+                width: 100vw;
+
+            }
+
+            #options-btn {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            * {
+                font-family: Lato, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+
+            h3 {
+                margin: 5px 5px;
+            }
+
+            #options-menu {
+                padding: 5px;
+            }
+
+            .bottom {
+                position: absolute;
+                bottom: 5px;
+                left: 5px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="page-wrapper">
+            <canvas>Your browser does not support html canvas. Please update to a newer browser.</canvas>
+            <div id="options-wrapper">
+                <div id="options-btn"><google-icon>menu</google-icon>
+                <noscript>Your browser has javascript disabled. Please enable it!</noscript>
+            </div>
+            <div id="options-menu">
+                <h3>Options</h3>
+                <p>Made using raw javascript, html and css, as a small side project. Icons and fonts from google icons. Javascript compressed using <a href="https://jscompress.com/">jscompress</a>.</p>
+                <p class="bottom">
+                    
+                </p>
+            </div>
+        </div>
+        <script type="text/javascript">
+
+            const canvas = document.querySelector("canvas")
+                , wrapper = document.body.children[0]
+                , ctx = canvas.getContext("2d")
+                , menu = document.getElementById("options-menu")
+                , mnubtn = document.getElementById("options-btn");
+            
+
+              var rot = Math.random() * (2 * Math.PI) //Random number between 0 and pi
+              , mult = 20
+              , open = false
+              , moved = false;
+
+            //Fitty
+            document.querySelectorAll("google-icon").forEach(element => {
+                fitty(element, {
+                    minsize: 12,
+                    maxSize: 60,
+                    multiline: false
+                });
+            })
+
+
+            //Options button
+            menu.style = "position: fixed; top: 20vh; left: 20vw; height: 60vh; width: 60vw; display: none; border: outset; background-color: #fff;";
+            mnubtn.addEventListener("click", ev => {
+                open = true;
+                menu.style.display = "initial";
+            })
+
+            window.addEventListener("keydown", ev => {
+                if (ev.key === "Escape")
+                {
+                    open ? menu.style.display = "none" : "";
+                }
+            })
+
+            canvas.addEventListener("click", ev => {
+                open ? menu.style.display = "none" : "";
+            })
+            
+            //Fullscreen canvas
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
+
+            var x, y
+              , x2 = Math.floor(canvas.width / 2)
+              , y2 = Math.floor(canvas.height / 2);
+
+            window.addEventListener("resize", (ev) => {
+                var ram = document.createElement("canvas")
+                  , ramctx = ram.getContext("2d");
+
+                ram.width = canvas.width;
+                ram.height = canvas.height;
+
+                ramctx.drawImage(canvas, 0, 0);
+
+                //Resize canvas (also clears it, sadly)
+                canvas.width = wrapper.clientWidth;
+                canvas.height = wrapper.clientHeight;
+
+                ctx.drawImage(ram, 0, 0);
+            })
+
+            function main()
+            {
+                //Main code
+                rot += (Math.random() * 1.5) - 1.5/2;
+
+                x = x2;
+                y = y2;
+
+                x2 += Math.sin(rot) * 10;
+                y2 += Math.cos(rot) * 10;
+
+                if (x2 > canvas.width)
+                {
+                    x2 = 0;
+                    moved = true;
+                    ctx.moveTo(x2, y2);
+                }
+                if (x2 < 0)
+                {
+                    x2 = canvas.width
+                    moved = true;
+                    ctx.moveTo(x2, y2);
+                }
+
+                if (y2 > canvas.height)
+                {
+                    y2 = 0;
+                    moved = true;
+                    ctx.moveTo(x2, y2);
+                }
+
+                if (y2 < 0)
+                {
+                    y2 = canvas.height
+                    moved = true;
+                    ctx.moveTo(x2, y2);
+                }
+
+                ctx.beginPath();
+                moved ? moved = false : ctx.moveTo(x, y);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+
+            setInterval(main, 100)
+        </script>
+    </body>
+</html>
